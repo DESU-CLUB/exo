@@ -188,11 +188,11 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
                 n_captured_toks = state.get("n_captured_toks", 0)
 
                 toks = await asyncio.get_event_loop().run_in_executor(
-                    self.executor, self.tokenizer.encode, prompt
+                    self.executor, tokenizer.encode, prompt
                 )
                 h = await asyncio.get_event_loop().run_in_executor(
                     self.executor,
-                    lambda: self.model(Tensor([toks]), start_pos, TEMPERATURE).realize(),
+                    lambda: sharded_model(Tensor([toks]), start_pos, TEMPERATURE).realize(),
                 )
 
                 if h.shape == (1,):
@@ -204,7 +204,7 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
                         json.dumps(
                             {"start_pos": start_pos, "n_captured_toks": n_captured_toks}
                         ),
-                        h.item() == self.tokenizer.eos_token_id,
+                        h.item() == tokenizer.eos_token_id,
                     )
                 else:
                     n_captured_toks = len(toks)
@@ -239,7 +239,7 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
 
                 h = await asyncio.get_event_loop().run_in_executor(
                     self.executor,
-                    lambda: self.model(Tensor(input_data), start_pos, TEMPERATURE).realize(),
+                    lambda: sharded_model(Tensor(input_data), start_pos, TEMPERATURE).realize(),
                 )
 
                 if h.shape == (1,):
@@ -251,7 +251,7 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
                         json.dumps(
                             {"start_pos": start_pos, "n_captured_toks": n_captured_toks}
                         ),
-                        h.item() == self.tokenizer.eos_token_id,
+                        h.item() == tokenizer.eos_token_id,
                     )
                 else:
                     return (
