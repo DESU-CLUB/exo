@@ -180,7 +180,7 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
 
         try:
             async with self.global_semaphore:
-                state = json.loads(inference_state or {})
+                state = json.loads(inference_state or "{}")
                 start_pos = state.get("start_pos", 0)
                 n_captured_toks = state.get("n_captured_toks", 0)
 
