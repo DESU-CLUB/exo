@@ -132,7 +132,6 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
 
             async with self.model_pool_locks[model_id]:
                 if model_id not in self.model_pools:
-                    self.logger.debug(f"Creating model pool for model_id: {model_id}")
                     # Create a new model pool
                     pool = asyncio.Queue(maxsize=NUM_MODELS_IN_POOL)
                     for _ in range(NUM_MODELS_IN_POOL):
@@ -142,9 +141,7 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
 
                     # Load and cache the tokenizer
                     self.tokenizers[model_id] = await resolve_tokenizer(model_id)
-                    self.logger.debug(
-                        f"Model pool and tokenizer created for model_id: {model_id}"
-                    )
+
         return self.model_pools[model_id]
 
     async def create_model_instance(self, shard: Shard):
@@ -183,7 +180,7 @@ class TinygradDynamicShardInferenceEngine(InferenceEngine):
 
         try:
             async with self.global_semaphore:
-                state = json.loads(inference_state)
+                state = json.loads(inference_state or {})
                 start_pos = state.get("start_pos", 0)
                 n_captured_toks = state.get("n_captured_toks", 0)
 
