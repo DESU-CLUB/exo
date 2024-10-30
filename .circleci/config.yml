@@ -251,6 +251,34 @@ workflows:
   version: 2
   build_and_test:
     jobs:
+      - approve_run:
+          type: approval
+          requires: []
+          filters:
+            branches:
+              ignore: main
+      - unit_test:
+          requires:
+            - approve_run
+      - discovery_integration_test:
+          requires:
+            - approve_run
+      - chatgpt_api_integration_test_mlx:
+          requires:
+            - approve_run
+      - test_macos_m1:
+          requires:
+            - approve_run
+      - chatgpt_api_integration_test_torch_linux_cpu:
+          requires:
+            - approve_run
+      - chatgpt_api_integration_test_torch_mac:
+          requires:
+            - approve_run
+
+  # Workflow for forked PRs without approval
+  forked_pr_workflow:
+    jobs:
       - unit_test
       - discovery_integration_test
       - chatgpt_api_integration_test_mlx
